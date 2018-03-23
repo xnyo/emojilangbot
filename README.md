@@ -22,7 +22,7 @@ This was a joke made for [Ripple](https://ripple.moe)'s 2018 April's fool day.
 
 ### Setting up
 - Install Python 3(.6) and pip  
-- Create a Discord Bot and add it to your server  
+- Create a Discord Bot and add it to your server with "Administration" privileges  
 - Create one or more channels in your Discord server for emoji-speaking people  
 Then, set up the bot:
 ```bash
