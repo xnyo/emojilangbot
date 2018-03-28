@@ -1,4 +1,4 @@
-import re
+import regex
 
 import discord
 from discord import Member
@@ -7,11 +7,15 @@ import emoji
 
 CONFIG = {
     "BOT_TOKEN": config("BOT_TOKEN", default=""),
-    "CHANNEL_ID": config("CHANNEL_ID", default="", cast=Csv(int))
+    "CHANNEL_IDS": config("CHANNEL_IDS", default="", cast=Csv(int))
 }
 client = discord.Client()
-emoji_regex = re.compile(r"^[{}\s]+$".format(emoji.get_emoji_regexp().pattern), re.UNICODE)
-mention_regex = re.compile(r"<@\d+>")
+emoji_regex = regex.compile(r"^[{}\s]+$".format(emoji.get_emoji_regexp().pattern), regex.UNICODE)
+regional_indicators_regex = regex.compile(
+    u"([^\U0001F1E6-\U0001F1FF]|^)[\U0001F1E6-\U0001F1FF]([^\U0001F1E6-\U0001F1FF]|$)",
+    regex.UNICODE
+)
+mention_regex = regex.compile(r"<@\d+>")
 
 
 @client.event
@@ -25,7 +29,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     # Ignore PMs, messages in different channels and our messages
-    if message.server is None or int(message.channel.id) not in CONFIG["CHANNEL_ID"] or message.author == client.user:
+    if message.server is None or int(message.channel.id) not in CONFIG["CHANNEL_IDS"] or message.author == client.user:
         return
 
     # Post rules if needed
@@ -47,8 +51,8 @@ async def on_message(message):
     # Strip mentions from the message
     clean_content = mention_regex.sub("", message.content).strip()
 
-    # Delete the message if it contains numbers/letters/symbols
-    if not clean_content or not emoji_regex.match(clean_content):
+    # Delete the message if it contains numbers/letters/symbols/regional code
+    if not clean_content or not emoji_regex.match(clean_content) or regional_indicators_regex.match(clean_content):
         await client.delete_message(message)
         print("=> Deleted message {}".format(message.content))
 
