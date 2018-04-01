@@ -10,12 +10,41 @@ CONFIG = {
     "CHANNEL_IDS": config("CHANNEL_IDS", default="", cast=Csv(int))
 }
 client = discord.Client()
+
 emoji_regex = regex.compile(r"^[{}\s]+$".format(emoji.get_emoji_regexp().pattern), regex.UNICODE)
-regional_indicators_regex = regex.compile(
-    u"([^\U0001F1E6-\U0001F1FF]|^)[\U0001F1E6-\U0001F1FF]([^\U0001F1E6-\U0001F1FF]|$)",
+other_forbidden_emojis = ["\U0001F170", "\U0001F171"]
+forbidden_emojis_regex = regex.compile(
+    u"([^\U0001F1E6-\U0001F1FF{r}]|^)[\U0001F1E6-\U0001F1FF{r}]([^\U0001F1E6-\U0001F1FF{r}]|$)".format(
+        r="".join(other_forbidden_emojis)
+    ),
     regex.UNICODE
 )
+flags_regex = regex.compile(u"([\U0001F1E6-\U0001F1FF][\U0001F1E6-\U0001F1FF])", regex.UNICODE)
 mention_regex = regex.compile(r"<@\d+>")
+FLAGS_EMOJIS = [
+    v.replace(" ", "")
+    for k, v in emoji.EMOJI_UNICODE.items()
+    if all([0x1F1E6 <= ord(x) <= 0x1F1FF or x == " " for x in v])
+]
+
+
+def is_emojilang(s):
+    # Strip mentions from the message
+    clean_content = mention_regex.sub("", s.content).strip()
+    # print(clean_content)
+    # print([(ord(x), hex(ord(x))) for x in clean_content])
+
+    # Regexes check
+    if not clean_content or not emoji_regex.match(clean_content) or forbidden_emojis_regex.match(clean_content):
+        return False
+
+    # Flags check
+    for flag in flags_regex.findall(clean_content):
+        if flag.strip() not in FLAGS_EMOJIS:
+            return False
+
+    # All fine
+    return True
 
 
 @client.event
@@ -49,10 +78,7 @@ async def on_message(message):
                                                    "\n**Have fun! :smile:**")
 
     # Strip mentions from the message
-    clean_content = mention_regex.sub("", message.content).strip()
-
-    # Delete the message if it contains numbers/letters/symbols/regional code
-    if not clean_content or not emoji_regex.match(clean_content) or regional_indicators_regex.match(clean_content):
+    if not is_emojilang(message):
         await client.delete_message(message)
         print("=> Deleted message {}".format(message.content))
 
