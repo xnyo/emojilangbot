@@ -13,15 +13,14 @@ CONFIG = {
 client = discord.Client()
 
 emoji_regex = regex.compile(r"^[{}\s]+$".format(emoji.get_emoji_regexp().pattern), regex.UNICODE)
-other_forbidden_emojis = ["\U0001F170", "\U0001F171"]
-forbidden_emojis_regex = regex.compile(
-    u"([^\U0001F1E6-\U0001F1FF{r}]|^)[\U0001F1E6-\U0001F1FF{r}]([^\U0001F1E6-\U0001F1FF{r}]|$)".format(
-        r="".join(other_forbidden_emojis)
-    ),
+regional_indicators_regex = regex.compile(
+    u"([^\U0001F1E6-\U0001F1FF]|^)[\U0001F1E6-\U0001F1FF]([^\U0001F1E6-\U0001F1FF]|$)",
     regex.UNICODE
 )
 flags_regex = regex.compile(u"([\U0001F1E6-\U0001F1FF][\U0001F1E6-\U0001F1FF])", regex.UNICODE)
 mention_regex = regex.compile(r"<@\d+>")
+
+FORBIDDEN_EMOJIS = ["\U0001F170", "\U0001F171"]
 FLAGS_EMOJIS = [
     v.replace(" ", "")
     for k, v in emoji.EMOJI_UNICODE.items()
@@ -48,8 +47,14 @@ def is_emojilang(s):
     # print([(ord(x), hex(ord(x))) for x in clean_content])
 
     # Regexes check
-    if not clean_content or not emoji_regex.match(clean_content) or forbidden_emojis_regex.match(clean_content):
+    # TODO: regional_indicators_regex doesn't work with spaces. wtf.
+    if not clean_content or not emoji_regex.match(clean_content) or regional_indicators_regex.match(clean_content.replace(" ", "")):
         return False
+
+    # Forbidden emojis
+    for x in clean_content:
+        if x in FORBIDDEN_EMOJIS:
+            return False
 
     # Flags check
     for flag in flags_regex.findall(clean_content):
