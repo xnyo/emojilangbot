@@ -18,7 +18,7 @@ regional_indicators_regex = regex.compile(
     regex.UNICODE
 )
 flags_regex = regex.compile(u"([\U0001F1E6-\U0001F1FF][\U0001F1E6-\U0001F1FF])", regex.UNICODE)
-mention_regex = regex.compile(r"<@\d+>")
+mention_regex = regex.compile(r"<@[!\d]+>")
 
 FORBIDDEN_EMOJIS = ["\U0001F170", "\U0001F171"]
 FLAGS_EMOJIS = [
