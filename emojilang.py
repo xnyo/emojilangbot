@@ -83,6 +83,19 @@ async def on_message(message):
         print("=> Deleted message {}".format(message.content))
 
 
+@client.event
+async def on_message_edit(before, after):
+    # TODO: decorator
+    # Ignore PMs, messages in different channels and our messages
+    if before.server is None or int(before.channel.id) not in CONFIG["CHANNEL_IDS"] or before.author == client.user:
+        return
+
+    # Run emoji check again
+    if not is_emojilang(after):
+        await client.delete_message(after)
+        print("=> Somebody tried to be akerino `{}` => `{}`".format(before.content, after.content))
+
+
 def main():
     print("""\033[92m            ∩
 　　　　　　　＼＼
