@@ -1,3 +1,4 @@
+import asyncio
 import regex
 
 import discord
@@ -26,6 +27,18 @@ FLAGS_EMOJIS = [
     for k, v in emoji.EMOJI_UNICODE.items()
     if all([0x1F1E6 <= ord(x) <= 0x1F1FF or x == " " for x in v])
 ]
+
+
+def num_to_emoji(n):
+    assert type(n) is int
+
+    numbers = [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:"]
+    n = str(n)
+    s = ""
+
+    for x in n:
+        s += numbers[int(x)]
+    return s
 
 
 def is_emojilang(s):
@@ -62,9 +75,9 @@ async def on_message(message):
         return
 
     # Post rules if needed
-    if message.content.strip().lower() == ";emoji" \
-            and type(message.author) is Member and message.author.server_permissions.administrator:
-        await client.send_message(message.channel, "**:wave: Welcome to the :joy: :speaking_head: channel!**\n\n"
+    if type(message.author) is Member and message.author.server_permissions.administrator:
+        if message.content.startswith(";emoji"):
+            await client.send_message(message.channel, "**:wave: Welcome to the :joy: :speaking_head: channel!**\n\n"
                                                    "_The_ :person_with_blond_hair:_kind  has been :thinking:_  "
                                                    "_a_ :question: _for ages..._\n"
                                                    "**Is it possible to :person_with_blond_hair::speech_balloon:"
@@ -76,6 +89,29 @@ async def on_message(message):
                                                    "__**All :speech_balloon: containing :abcd:, :one: :two:, :symbols: "
                                                    "will get :put_litter_in_its_place:! :angry::anger:**__"
                                                    "\n**Have fun! :smile:**")
+        elif message.content.startswith(";clean"):
+            # Delete trigger message immediately
+            await client.delete_message(message)
+            bot_response = await client.send_message(
+                message.channel, ":robot: :timer: :envelope: :mag:    :five::zero::zero:"
+            )
+            try:
+                counter = 0
+                async for log in client.logs_from(message.channel, limit=500):
+                    if log.author != client.user:
+                        counter += 1
+                        if not is_emojilang(log):
+                            await client.delete_message(log)
+            except:
+                await client.edit_message(bot_response, ":warning: :frowning2: :envelope: :mag:")
+                raise
+
+            await client.edit_message(bot_response, ":grimacing: :ok_hand: :envelope: :mag: :point_right: {}".format(
+                num_to_emoji(counter)
+            ))
+            await asyncio.sleep(5)
+            await client.delete_message(bot_response)
+            return
 
     # Strip mentions from the message
     if not is_emojilang(message):
