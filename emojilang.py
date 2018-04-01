@@ -19,6 +19,7 @@ regional_indicators_regex = regex.compile(
 )
 flags_regex = regex.compile(u"([\U0001F1E6-\U0001F1FF][\U0001F1E6-\U0001F1FF])", regex.UNICODE)
 mention_regex = regex.compile(r"<@[!\d]+>")
+not_regional_indicators_regex = regex.compile(u"[^\U0001F1E6-\U0001F1FF\s]")
 
 FORBIDDEN_EMOJIS = ["\U0001F170", "\U0001F171"]
 FLAGS_EMOJIS = [
@@ -44,8 +45,8 @@ def is_emojilang(s):
     # Strip mentions from the message
     original_content = s.content
     clean_content = mention_regex.sub("", s.content).strip()
-    # print(clean_content)
-    # print([(ord(x), hex(ord(x))) for x in clean_content])
+    print(clean_content)
+    print([(ord(x), hex(ord(x))) for x in clean_content])
 
     # Mention only message
     if not clean_content and original_content.strip():
@@ -53,7 +54,7 @@ def is_emojilang(s):
 
     # Regexes check
     # TODO: regional_indicators_regex doesn't work with spaces. wtf.
-    if not clean_content or not emoji_regex.match(clean_content) or regional_indicators_regex.match(clean_content) or regional_indicators_regex.match(clean_content.replace(" ", "")):
+    if not clean_content or not emoji_regex.match(clean_content) or regional_indicators_regex.match(not_regional_indicators_regex.sub("", clean_content).strip()):
         return False
 
     # Forbidden emojis
