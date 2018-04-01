@@ -53,7 +53,7 @@ def is_emojilang(s):
 
     # Regexes check
     # TODO: regional_indicators_regex doesn't work with spaces. wtf.
-    if not clean_content or not emoji_regex.match(clean_content) or regional_indicators_regex.match(clean_content.replace(" ", "")):
+    if not clean_content or not emoji_regex.match(clean_content) or regional_indicators_regex.match(clean_content) or regional_indicators_regex.match(clean_content.replace(" ", "")):
         return False
 
     # Forbidden emojis
