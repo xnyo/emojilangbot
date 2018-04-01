@@ -42,9 +42,14 @@ def num_to_emoji(n):
 
 def is_emojilang(s):
     # Strip mentions from the message
+    original_content = s.content
     clean_content = mention_regex.sub("", s.content).strip()
     # print(clean_content)
     # print([(ord(x), hex(ord(x))) for x in clean_content])
+
+    # Mention only message
+    if not clean_content and original_content.strip():
+        return True
 
     # Regexes check
     # TODO: regional_indicators_regex doesn't work with spaces. wtf.
