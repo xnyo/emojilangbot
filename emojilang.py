@@ -19,7 +19,6 @@ regional_indicators_regex = regex.compile(
 )
 flags_regex = regex.compile(u"([\U0001F1E6-\U0001F1FF][\U0001F1E6-\U0001F1FF])", regex.UNICODE)
 mention_regex = regex.compile(r"<@[!\d]+>")
-not_regional_indicators_regex = regex.compile(u"[^\U0001F1E6-\U0001F1FF\s]")
 
 FORBIDDEN_EMOJIS = ["\U0001F170", "\U0001F171"]
 FLAGS_EMOJIS = [
@@ -53,8 +52,7 @@ def is_emojilang(s):
         return True
 
     # Regexes check
-    # TODO: regional_indicators_regex doesn't work with spaces. wtf.
-    if not clean_content or not emoji_regex.match(clean_content) or regional_indicators_regex.match(not_regional_indicators_regex.sub("", clean_content).strip()):
+    if not clean_content or not emoji_regex.match(clean_content) or regional_indicators_regex.search(clean_content):
         return False
 
     # Forbidden emojis
