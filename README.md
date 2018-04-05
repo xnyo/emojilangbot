@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="https://eggplants.org/cuh8hg.svg" height="248">
+  <img src="https://eggplants.org/4vash2.png" height="248">
   <h2 align="center">EmojiLang Bot</h2>
   <h3 align="center">A Discord bot for emoji-speaking people!</h2>
 </p>
 
 ---
 
-> _The :person_with_blond_hair:_kind has been :thinking:  a :question: for ages..._  
+> _The_ :person_with_blond_hair:_kind has been_ :thinking: _a_ :question: _for ages..._  
 > **Is it possible to :person_with_blond_hair::speech_balloon::speech_balloon::person_with_blond_hair: only by using :joy::joy:?**  
 > For the sake of :alembic:, I'm here to try to :bulb:!  
 
